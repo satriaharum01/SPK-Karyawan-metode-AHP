@@ -28,9 +28,8 @@
                 @endif
 
                 @if (count($criterias))
-                <form id="form" method="post" action="{{ route('criteria.matrix.store') }}">
+                <form id="form" method="GET" action="{{ route('criteria.matrix.calculate') }}">
                     @csrf
-                    @method('POST')
                     <table class="table border">
                         <thead>
                             <tr class="text-center">
@@ -48,9 +47,7 @@
                                 <td>
                                     <select name="{{$cell->id}}" class="form-select px-4 matrix_select" style="padding: 5px 20px" {{$cell['row_idx'] == $cell['column_idx'] ? 'disabled' : ''}} data-id="{{$cell['row_idx'] . ',' . $cell['column_idx']}}">
                                         <option data-dynamic="true" value="{{$cell['value']}}">{{ number_format($cell->value, 3, ',') }}</option>
-                                        @foreach (range(1,9) as $point)
-                                        <option value="{{$point}}">{{$point}}</option>
-                                        @endforeach
+                                        
                                     </select>
                                 </td>
                                 @endforeach
@@ -111,8 +108,8 @@
                     <div class="row">
                         <div class="col-6">
                             <p class="p-0 m-0" style="color: #333">Consistensi Index = (max λ - n) / (n-1)</p>
-                            <p class="p-0 m-0" style="color: #333">CI = ({{number_format($max_lamda, 2)}} - {{$count_criteria}}) / {{$count_criteria-1}}</p>
-                            <p class="p-0 m-0" style="color: #333">CI = {{number_format($CI, 2)}}</p>
+                            <p class="p-0 m-0" style="color: #333">CI = ({{$max_lamda}} - {{$count_criteria}}) / {{$count_criteria-1}}</p>
+                            <p class="p-0 m-0" style="color: #333">CI = {{$CI}}</p>
                         </div>
                         <div class="col-6">
                             <p class="p-0 m-0" style="color: #333">Consistensi Ratio = CI/IR</p>
@@ -183,31 +180,7 @@
             }
         });
 
-        $('#form').submit(function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            $(this).find('select:disabled').prop('disabled', false);
-            $(this).find('option:disabled').prop('disabled', false);
-            var formData = $(this).serialize(); // Serialize the form data
-
-            var url = "{{ route('criteria.matrix.store') }}"
-            $.ajax({
-                url: url, // Replace with the actual URL to your controller route
-                method: 'POST', // Replace with the appropriate HTTP method
-                data: formData,
-                success: function(response) {
-                    // Handle the response from the server
-                    toastr.success('Data berhasil disimpan');
-
-                    setTimeout(() => {
-                        window.location.href = response.redirect
-                    }, 2000);
-                },
-                error: function() {
-                    // Handle the error if the request fails
-                }
-            });
-        });
-
+        
         // $(function() {
         //     $('[data-toggle="tooltip"]').tooltip()
         // })

@@ -11,6 +11,7 @@ use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\SubcriteriaComparisonController;
 use App\Http\Controllers\SubcriteriaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\KuesionerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('criteria/destroy/{id}', [CriteriaController::class, 'destroy'])->name('criteria.destroy');
         Route::get('criteria/matrix', [CriteriaComparisonController::class, 'index'])->name('criteria.matrix');
         Route::post('criteria/matrix/store', [CriteriaComparisonController::class, 'store'])->name('criteria.matrix.store');
+        
+        Route::get('criteria/quesioner', [KuesionerController::class, 'index'])->name('criteria.quesioner');
+        Route::post('criteria/quesioner/store', [KuesionerController::class, 'store'])->name('criteria.quesioner.store');
+        Route::get('criteria/quesioner/destroy/{name}', [KuesionerController::class, 'destroy'])->name('criteria.quesioner.destroy');
+        Route::get('criteria/quesioner/edit/{name}', [KuesionerController::class, 'edit'])->name('criteria.quesioner.edit');
+        Route::put('criteria/quesioner/update/{name}', [KuesionerController::class, 'update'])->name('criteria.quesioner.update');
+        Route::get('criteria/quesioner/geodata', [CriteriaComparisonController::class, 'geodata'])->name('criteria.matrix.calculate');
 
         Route::get('subciteria/{criteriaId}', [SubcriteriaController::class, 'index'])->where('criteriaId', '[0-9]+')->name('subcriteria');
         Route::post('subciteria/store', [SubcriteriaController::class, 'store'])->name('subcriteria.store');

@@ -40,17 +40,27 @@ class Criteria extends Model
 
     public static function getMaxLamda()
     {
-        return round(self::sum('eigen'), 2);
+        return self::sum('eigen');
     }
 
     public static function getCI()
     {
-        return round((self::getMaxLamda() - self::count()) / (self::count() - 1), 2);
+        $CI = (self::getMaxLamda() - self::count()) / (self::count() - 1);
+        if($CI > 1/100){
+            return number_format($CI, 2);
+        }else{
+            return $CI;
+        }
     }
     public static function getCR()
     {
         $ir = Formula::$nilai_index_random[self::count()];
-        return $ir == 0 ? 0 : round((self::getCI() / $ir), 2);
+        $ir == 0 ? 0 : $CR = (self::getCI() / $ir);
+        if($CR > 1/100){
+            return number_format($CI, 2);
+        }else{
+            return $CR;
+        }
     }
 
     public static function isCRValid()

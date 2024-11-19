@@ -13,6 +13,9 @@
                     <a type="button" class="btn btn-success" href="{{ route('criteria.matrix') }}">
                         Matrix Kriteria
                     </a>
+                    <a type="button" class="btn btn-info" href="{{ route('criteria.quesioner') }}">
+                        Kuesioner Kriteria
+                    </a>
                 </div>
                 <table class="table border">
                     <thead>
