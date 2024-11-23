@@ -29,9 +29,8 @@
                 </div>
                 @endif
                 @if (count($subcriterias))
-                <form method="post" action="/perhitungan_subkriteria/store">
+                <form  method="GET" action="{{ route('subcriteria.matrix.calculate', ['criteriaId'=> $criteria_id]) }}">
                     @csrf
-                    @method('POST')
                     <div class="table-responsive">
                         <table class="table border w-100">
                             <thead>
@@ -50,9 +49,6 @@
                                     <td>
                                         <select name="{{$cell->id}}" class="form-select px-4 matrix_select" style="padding: 5px 20px" {{$cell['row_idx'] == $cell['column_idx'] ? ' disabled ' : ''}} data-id="{{$cell['row_idx'] . ',' . $cell['column_idx']}}">
                                             <option data-dynamic="true" value="{{$cell['value']}}">{{ number_format($cell->value, 3, ',') }}</option>
-                                            @foreach (range(1,9) as $point)
-                                            <option value="{{$point}}">{{$point}}</option>
-                                            @endforeach
                                         </select>
                                     </td>
                                     @endforeach
@@ -112,13 +108,13 @@
                     </table>
                 </div>
                 <div class="col-12 my-2 w-70 mx-auto">
-                    <p class="p-0 m-0" style="color: #333">Max λ = {{number_format($max_lamda, 3, ',')}}</p>
+                    <p class="p-0 m-0" style="color: #333">Max λ = {{$max_lamda}}</p>
                     <p class="p-0 m-0" style="color: #333">n = {{count($subcriterias)}}</p>
                     <div class="row">
                         <div class="col-6">
                             <p class="p-0 m-0" style="color: #333">Consistensi Index = (max λ - n) / (n-1)</p>
-                            <p class="p-0 m-0" style="color: #333">CI = ({{number_format($max_lamda, 3, ',')}} - {{$count_subcriteria}}) / {{$count_subcriteria-1}}</p>
-                            <p class="p-0 m-0" style="color: #333">CI = {{number_format($CI, 3, ',')}}</p>
+                            <p class="p-0 m-0" style="color: #333">CI = ({{($max_lamda)}} - {{$count_subcriteria}}) / {{$count_subcriteria-1}}</p>
+                            <p class="p-0 m-0" style="color: #333">CI = {{$CI}}</p>
                         </div>
                         <div class="col-6">
                             <p class="p-0 m-0" style="color: #333">Consistensi Ratio = CI/IR</p>
@@ -188,33 +184,6 @@
                     'data-dynamic': true
                 }));
             }
-        });
-
-        $('form').submit(function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            $(this).find('select:disabled').prop('disabled', false);
-            $(this).find('option:disabled').prop('disabled', false);
-            var formData = $(this).serialize(); // Serialize the form data
-
-            var criteriaId = $('#criteria-id').val()
-            var url = "{{ route('subcriteria.matrix.store', ['criteriaId' => ':criteria_id']) }}"
-            url = url.replace(':criteria_id', criteriaId)
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    // Handle the response from the server
-                    toastr.success('Data berhasil disimpan');
-
-                    setTimeout(() => {
-                        window.location.href = response.redirect
-                    }, 2000);
-                },
-                error: function() {
-                    // Handle the error if the request fails
-                }
-            });
         });
 
 

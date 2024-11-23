@@ -113,7 +113,7 @@ class Assessment extends Model
                 $subcriteria->load('assessments');
                 foreach ($subcriteria->assessments as $assessment) {
                     $assessment->normalization_value =
-                        $subcriteria->alternative_column_sum > 0 ? ($assessment->value / $subcriteria->alternative_column_sum) : 0;
+                        $subcriteria->alternative_column_sum > 0 ? (($assessment->value / 4) * $subcriteria->priority) : 0;
                     $assessment->save();
                 }
             }
@@ -124,7 +124,7 @@ class Assessment extends Model
                 $employeeResultValue = 0;
                 foreach ($employee->assessments as $assessment) {
                     $assessment->load(['subcriteria', 'criteria']);
-                    $employeeResultValue += ($assessment->normalization_value * $assessment->subcriteria->priority * $assessment->criteria->priority);
+                    $employeeResultValue += ($assessment->normalization_value * $assessment->criteria->priority);
                     $employee->save();
                 }
                 $employee->value = $employeeResultValue;

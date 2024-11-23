@@ -57,7 +57,7 @@ class Criteria extends Model
         $ir = Formula::$nilai_index_random[self::count()];
         $ir == 0 ? 0 : $CR = (self::getCI() / $ir);
         if($CR > 1/100){
-            return number_format($CI, 2);
+            return number_format($CR, 2);
         }else{
             return $CR;
         }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\helpers\Formula;
 use App\Models\Subcriteria;
 use App\Models\SubcriteriaComparison;
+use App\Models\SubcriteriaQuesioner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,6 +38,47 @@ class SubcriteriaComparisonController extends Controller
         ));
     }
 
+    public function geodata($criteria_id)
+    {
+        $subcriteria = Subcriteria::where('criteria_id',$criteria_id)->orderBy('order')->get();
+        $data = array();
+        $geomean = array();
+        $i = 1;
+        $gep = array();
+        foreach ($subcriteria as $low) {
+            $j = 1;
+            foreach ($subcriteria as $row) {
+                if ($row->id == $low->id) {
+                    $geomean[$i][$j] = 1;
+                } elseif ($row->order >= $low->order) {
+                    $geodata = array();
+                    $kuesioner = SubcriteriaQuesioner::select('pilihan')->where('id_subcriteria', $low->id)->where('id_comparison_subcriteria', $row->id)->get();
+                    foreach ($kuesioner as $kues) {
+                        $geodata[] = Formula::$pilihan_responden[$kues->pilihan];
+                    }
+                    $geomean[$i][$j] = $this->calculateGeomean($geodata);
+                    $gep[] =  $this->calculateGeomean($geodata);
+                } else {
+                    $geomean[$i][$j] = 1 / $geomean[$j][$i];
+                }
+                $j++;
+            }
+            $i++;
+        }
+        $sum = array();
+        for ($i = 1; $i <= $subcriteria->count();$i++) {
+            $sum[$i] = array_sum(array_column($geomean, $i));
+            subcriteria::where('criteria_id',$criteria_id)->where('order', $i)->update(['comparison_column_sum' => $sum[$i]]);
+        }
+
+        //Normalisasi Matriks
+        $this->normalizationMatrix($geomean, $sum, $criteria_id);
+
+        SubcriteriaComparison::calculateMatrix($criteria_id);
+
+        return redirect()->route('subcriteria.matrix', ['criteriaId' => $criteria_id]);
+    }
+
     public function store(Request $request, $criteria_id)
     {
         // dd($request);
@@ -58,6 +100,45 @@ class SubcriteriaComparisonController extends Controller
         return response()->json(['redirect' => $redirect]);
     }
 
+    public function calculateGeomean(array $numbers)
+    {
+        $product = 1; // Inisialisasi hasil perkalian
+        $count = count($numbers); // Jumlah elemen dalam array
+
+        if ($count === 0) {
+            return null; // Return null jika array kosong
+        }
+
+        foreach ($numbers as $number) {
+            if ($number <= 0) {
+                return null; // Geomean tidak valid untuk angka nol atau negatif
+            }
+            $product *= $number;
+        }
+
+        // Menghitung akar pangkat ke-n dari hasil perkalian
+        return pow($product, 1 / $count);
+    }
+
+    public function normalizationMatrix($data, $sum, $criteria_id)
+    {
+        $rowSum = array();
+        $temp = array();
+        foreach ($data as $key => $val) {
+            foreach ($val as $idx => $idxVal) {
+                $normalizationVal = $idxVal / $sum[$key];
+                $temp[] = $normalizationVal;
+                SubcriteriaComparison::whereHas('subcriteria', function ($query) use ($criteria_id) {
+                    $query->where('criteria_id', $criteria_id);
+                })->where('row_idx', $key)->where('column_idx', $idx)->update(['value' => $idxVal]);
+                SubcriteriaComparison::whereHas('subcriteria', function ($query) use ($criteria_id) {
+                    $query->where('criteria_id', $criteria_id);
+                })->where('row_idx', $key)->where('column_idx', $idx)->update(['normalization_value' => $normalizationVal]);
+            }
+            Subcriteria::where('criteria_id',$criteria_id)->where('order', $key)->update(['normalization_row_sum' => array_sum($temp)]);
+        }
+
+    }
     // public function alternatif()
     // {
     //     $kriterias = Criteria::get();

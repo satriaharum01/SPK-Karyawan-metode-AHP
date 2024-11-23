@@ -12,6 +12,7 @@ use App\Http\Controllers\SubcriteriaComparisonController;
 use App\Http\Controllers\SubcriteriaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\KuesionerController;
+use App\Http\Controllers\SubKuesionerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,7 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('criteria/destroy/{id}', [CriteriaController::class, 'destroy'])->name('criteria.destroy');
         Route::get('criteria/matrix', [CriteriaComparisonController::class, 'index'])->name('criteria.matrix');
         Route::post('criteria/matrix/store', [CriteriaComparisonController::class, 'store'])->name('criteria.matrix.store');
-        
+
         Route::get('criteria/quesioner', [KuesionerController::class, 'index'])->name('criteria.quesioner');
         Route::post('criteria/quesioner/store', [KuesionerController::class, 'store'])->name('criteria.quesioner.store');
         Route::get('criteria/quesioner/destroy/{name}', [KuesionerController::class, 'destroy'])->name('criteria.quesioner.destroy');
@@ -80,6 +81,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('subciteria/destroy/{id}', [SubcriteriaController::class, 'destroy'])->where('id', '[0-9]+')->name('subcriteria.destroy');
         Route::get('subciteria/{criteriaId}/matrix', [SubcriteriaComparisonController::class, 'index'])->where('criteriaId', '[0-9]+')->name('subcriteria.matrix');
         Route::post('subciteria/{criteriaId}/matrix/store', [SubcriteriaComparisonController::class, 'store'])->where('criteriaId', '[0-9]+')->name('subcriteria.matrix.store');
+
+        Route::get('subciteria/{criteriaId}/quesioner', [SubKuesionerController::class, 'index'])->where('criteriaId', '[0-9]+')->name('subcriteria.quesioner');
+        Route::post('subciteria/quesioner/store', [SubKuesionerController::class, 'store'])->name('subcriteria.quesioner.store');
+        Route::get('subciteria/{criteriaId}/quesioner/destroy/{name}', [SubKuesionerController::class, 'destroy'])->where('criteriaId', '[0-9]+')->name('subcriteria.quesioner.destroy');
+        Route::get('subciteria/{criteriaId}/quesioner/edit/{name}', [SubKuesionerController::class, 'edit'])->where('criteriaId', '[0-9]+')->name('subcriteria.quesioner.edit');
+        Route::put('subciteria/quesioner/update/{name}', [SubKuesionerController::class, 'update'])->name('subcriteria.quesioner.update');
+        Route::get('subciteria/{criteriaId}/quesioner/geodata', [SubcriteriaComparisonController::class, 'geodata'])->where('criteriaId', '[0-9]+')->name('subcriteria.matrix.calculate');
 
         Route::get('assessment/calculate', [AssessmentController::class, 'calculate'])->name('assessment.calculate');
     });

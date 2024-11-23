@@ -95,7 +95,6 @@ class AssessmentController extends Controller
         }
 
         Assessment::calculate();
-
         toast('Berhasil hitung nilai', "success");
         return redirect()->back();
     }

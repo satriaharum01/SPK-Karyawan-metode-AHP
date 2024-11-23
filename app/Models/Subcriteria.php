@@ -50,12 +50,24 @@ class Subcriteria extends Model
     public static function getCI($criteriaId)
     {
         $count = Subcriteria::where('criteria_id', $criteriaId)->count();
-        return number_format((self::getMaxLamda($criteriaId) - $count) / ($count - 1), 2);
+
+        $CI = ((self::getMaxLamda($criteriaId) - $count) / ($count - 1));
+        if ($CI > 1 / 100) {
+            return number_format($CI, 2);
+        } else {
+            return $CI;
+        }
     }
     public static function getCR($criteriaId)
     {
         $count = Subcriteria::where('criteria_id', $criteriaId)->count();
-        return number_format((self::getCI($criteriaId) / Formula::$nilai_index_random[$count]), 2);
+        $ir = Formula::$nilai_index_random[$count];
+        $ir == 0 ? 0 : $CR = (self::getCI($criteriaId) / $ir);
+        if ($CR > 1 / 100) {
+            return number_format($CR, 2);
+        } else {
+            return $CR;
+        }
     }
 
     public static function isCRValid($criteriaId)

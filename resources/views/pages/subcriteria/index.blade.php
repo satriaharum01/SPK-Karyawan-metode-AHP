@@ -14,6 +14,9 @@
                     <a href="{{ route('subcriteria.matrix', ['criteriaId' => $criteria_id]) }}" class="btn btn-success">
                         Matrix
                     </a>
+                    <a type="button" class="btn btn-info" href="{{ route('subcriteria.quesioner', ['criteriaId' => $criteria_id]) }}">
+                        Kuesioner
+                    </a>
                     <a href="{{ route('criteria') }}" class="btn btn-warning">
                         Kembali
                     </a>
